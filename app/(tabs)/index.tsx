@@ -1,18 +1,26 @@
-import { Text, View } from "react-native";
-import { styles } from '../../styles/auth.styles';
+
+import { createHomeStyles } from "@/assets/styles/home.styles";
+import Header from "@/components/Header";
+import TodoInput from "@/components/TodoInput";
+import useTheme from "@/hooks/useTheme";
+import { LinearGradient } from 'expo-linear-gradient';
+import { StatusBar } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function Index() {
+  const {toggleDarkMode,colors}=useTheme();
+   const homeStyles=createHomeStyles(colors);
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Welocme app
-      </Text>
-  
-      
-      <Text>settings</Text>
-   
-      
-    </View>
+    
+    <LinearGradient colors={colors.gradients.background} style={homeStyles.container}>
+      <StatusBar barStyle={colors.statusBarStyle} translucent={true} backgroundColor="transparent"/>
+    <SafeAreaView style={homeStyles.safeArea}>
+      <Header/>
+     <TodoInput/>
+    </SafeAreaView>
+    </LinearGradient>
   );
 }
 
