@@ -1,5 +1,6 @@
 
 import { createHomeStyles } from "@/assets/styles/home.styles";
+import EmptyState from "@/components/EmptyState";
 import Header from "@/components/Header";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import TodoInput from "@/components/TodoInput";
@@ -9,7 +10,7 @@ import useTheme from "@/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "convex/react";
 import { LinearGradient } from 'expo-linear-gradient';
-import { Alert, FlatList, StatusBar, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, StatusBar, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 type Todo=Doc<"todos">
@@ -20,6 +21,7 @@ export default function Index() {
    // todos is undefined when loading
 
    const toggleTodo=useMutation(api.todos.toggleTodo);
+   const deleteTodo=useMutation(api.todos.deleteTodo);
 
    let loading= (todos == undefined) ;
    if(loading) return <LoadingSpinner/> ;
@@ -34,6 +36,14 @@ export default function Index() {
       
     }
   }
+
+  const handleDeleteTodo=async (id:Id<"todos">) =>{
+            Alert.alert("Delete","Are you sure, you want to delete this todo?",
+       [
+        {text:"Cancel",style:"cancel"},
+        {text:"Delete",style:"default",onPress:()=>deleteTodo({id})},
+       ])
+     }
 
    const renderTodoItem=({item}:{item:Todo})=>{
     return <View style={homeStyles.todoItemWrapper}>
@@ -56,6 +66,31 @@ export default function Index() {
 
         </LinearGradient>
          </TouchableOpacity>
+         <View style={homeStyles.todoTextContainer}>
+         <Text
+          style={[homeStyles.todoText ,item.isCompleted && 
+            {textDecorationLine:"line-through",
+            color:colors.textMuted,
+            opacity:0.6,
+          },
+          ]}>
+          {item.text}
+         </Text>
+              <View style={homeStyles.todoActions}>
+                <TouchableOpacity onPress={()=>{}} activeOpacity={0.8}>
+                  <LinearGradient colors={colors.gradients.warning} style={homeStyles.actionButton}>
+                    <Ionicons name="pencil" size={12} color="#fff"/>
+                  </LinearGradient>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>handleDeleteTodo(item._id)} activeOpacity={0.8}>
+                  <LinearGradient colors={colors.gradients.danger} style={homeStyles.actionButton}>
+                    <Ionicons name="trash" size={12} color="#fff"/>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+              </View>
+
+         </View>
       </LinearGradient>
           
     </View>
@@ -71,11 +106,14 @@ export default function Index() {
      {/* {todos?.map((todo)=> <Text key={todo._id}>{todo.text}</Text>
 
      )} */}
-     <FlatList data={todos}
+     <FlatList 
+     data={todos}
       renderItem={renderTodoItem}
       keyExtractor={(item)=>item._id}
       style={homeStyles.todoList}
       contentContainerStyle={homeStyles.todoListContent}
+      ListEmptyComponent={<EmptyState/>}
+      // showsVerticalScrollIndicator={false}
       />
     </SafeAreaView>
     </LinearGradient>
